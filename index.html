@@ -12,16 +12,72 @@
         <input id = "seconds" type="number" min = "0" max ="59" placeholder="Secondes">
 
         <button id = "startButton">Démarrer</button>
+        <button id = "pauseButton">Pause</button>
+        <button id = "playButton">Play</button>
+        <button id = "restartButton">Redémarrer</button>
+
+        <div id = "timer">
+            00:00:00
+        </div>
 
         <script>
+            //--------------------------------------
+            /*FONCTION DE DEMARRAGE DU TIMER*/
+            //--------------------------------------
+            function startTimer()
+            {
+                //console.log("Conversion en secondes: ", secondsConvert)
+                if (secondsConvert > 0)
+                {
+                    secondsConvert--
+                }
+                else if (secondsConvert === 0)
+                {
+                    clearInterval(idInterval)
+                }
+                
+                hours = Math.floor(secondsConvert / 3600)
+                minutes = Math.floor((secondsConvert % 3600) / 60)
+                seconds = (secondsConvert % 3600) % 60
+
+                console.log("Heures:", hours, " Minutes:", minutes, " Secondes:", seconds)
+                timer.textContent = format2(hours) + ":" + format2(minutes) + ":" + format2(seconds)
+            }
+
+            //--------------------------------------
+            /*FONCTION DE FORMATAGE HORAIRE*/
+            //--------------------------------------
+            function format2(nombre)
+            {
+                return String(nombre).padStart(2,"0")
+            }
+
+            //--------------------------------------
+            /*CREATION DE VARIABLES*/
+            //--------------------------------------
             let startButton = document.getElementById("startButton")
+            let pauseButton = document.getElementById("pauseButton")
+            let playButton = document.getElementById("playButton")
+            let restartButton = document.getElementById("restartButton")
+            let idInterval
+            let secondsConvert
+            let hours
+            let minutes
+            let seconds
+            let timer
+
+            playButton.disabled = true
+            pauseButton.disabled = true
 
             startButton.addEventListener("click", 
             function()
             {
-                let hours = document.getElementById("hours").value
-                let minutes = document.getElementById("minutes").value
-                let seconds = document.getElementById("seconds").value
+                startButton.disabled = true
+                pauseButton.disabled = false
+                hours = document.getElementById("hours").value
+                minutes = document.getElementById("minutes").value
+                seconds = document.getElementById("seconds").value
+                timer = document.getElementById("timer")
                 
                 if (hours === "")
                 {
@@ -53,26 +109,52 @@
                 minutes = Math.max(0,Math.min(minutes, 59))
                 seconds = Math.max(0,Math.min(seconds, 59))
 
-                let secondsConvert = hours*3600 + minutes*60 + seconds
+                secondsConvert = hours*3600 + minutes*60 + seconds
+
+                console.log("Démarrer")
+                //--------------------------------------
+                /*DECOMPTE DU TEMPS*/
+                //--------------------------------------
+                idInterval = setInterval(startTimer,1000)
                 
-                setInterval(
-                    function()
-                    {
-                        //console.log("Conversion en secondes: ", secondsConvert)
+            })
 
-                        if (secondsConvert > 0)
-                        {
-                            secondsConvert--
-                        }
-                        
-                        hours = Math.floor(secondsConvert / 3600)
-                        minutes = Math.floor((secondsConvert % 3600) / 60)
-                        seconds = (secondsConvert % 3600) % 60
+            pauseButton.addEventListener("click", function()
+            {
+                playButton.disabled = false
+                pauseButton.disabled = true
+                console.log("Pause")
+                clearInterval(idInterval)
+                console.log("Heures:", hours, " Minutes:", minutes, " Secondes:", seconds)
+                timer.textContent = format2(hours) + ":" + format2(minutes) + ":" + format2(seconds)
+            })
 
-                        console.log("Heures:", hours, " Minutes:", minutes, " Secondes:", seconds)
-                    },
-                    1000
-                )
+            playButton.addEventListener("click", function()
+            {
+                console.log("Play")
+                playButton.disabled = true
+                pauseButton.disabled = false
+                //--------------------------------------
+                /*DECOMPTE DU TEMPS*/
+                //--------------------------------------
+                idInterval = setInterval(startTimer,1000)
+            })
+
+            restartButton.addEventListener("click", function()
+            {
+                clearInterval(idInterval)
+
+                startButton.disabled = false
+                playButton.disabled = true
+                pauseButton.disabled = true
+                console.log("Redémarrer")
+
+                secondsConvert = 0
+                hours = 0
+                minutes = 0
+                seconds = 0
+
+                timer.textContent = format2(hours) + ":" + format2(minutes) + ":" + format2(seconds)
 
             })
         </script>
